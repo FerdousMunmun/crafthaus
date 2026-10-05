@@ -5,415 +5,538 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import {
-  createProject,
-  toggleProjectPublished,
+    createProject,
+    updateProject,
+    deleteProject,
+    toggleProjectPublished,
 } from "@/services/api";
 
 import { uploadImage } from "@/services/image";
 
 interface AdminProject {
-  _id: string;
-  title: string;
-  shortDescription?: string;
-  slug: string;
-  category: string;
-  year: string;
-  description: string;
-  image: string;
-  published: boolean;
+    _id: string;
+    title: string;
+    shortDescription?: string;
+    slug: string;
+    category: string;
+    year: string;
+    description: string;
+    image: string;
+    published: boolean;
 }
 
 interface AdminProjectsClientProps {
-  projectCount: number;
-  projects: AdminProject[];
+    projectCount: number;
+    projects: AdminProject[];
 }
 
 export default function AdminProjectsClient({
-  projectCount,
-  projects = [],
+    projectCount,
+    projects = [],
 }: AdminProjectsClientProps) {
-  const router = useRouter();
+    const router = useRouter();
 
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [publishingId, setPublishingId] =
-    useState<string | null>(null);
+    const [showForm, setShowForm] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [publishingId, setPublishingId] =
+        useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("");
-  const [year, setYear] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+    const [editingProject, setEditingProject] =
+        useState<AdminProject | null>(null);
 
-  const resetForm = () => {
-    setTitle("");
-    setSlug("");
-    setCategory("");
-    setYear("");
-    setDescription("");
-    setImage(null);
-    setShowForm(false);
-  };
+    const [title, setTitle] = useState("");
+    const [slug, setSlug] = useState("");
+    const [category, setCategory] = useState("");
+    const [year, setYear] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState<File | null>(null);
 
-  const handleTitleChange = (value: string) => {
-    setTitle(value);
+    const resetForm = () => {
+        setTitle("");
+        setSlug("");
+        setCategory("");
+        setYear("");
+        setDescription("");
+        setImage(null);
+        setShowForm(false);
+        setEditingProject(null);
+    };
 
-    setSlug(
-      value
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
-    );
-  };
+    const handleTitleChange = (value: string) => {
+        setTitle(value);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-
-    if (
-      !title ||
-      !slug ||
-      !category ||
-      !year ||
-      !description ||
-      !image
-    ) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const imageUrl = await uploadImage(image);
-
-      await createProject({
-        title,
-        slug,
-        category,
-        year,
-        description,
-        image: imageUrl,
-        published: false,
-      });
-
-      toast.success("Project created successfully.");
-
-      resetForm();
-
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-
-      toast.error("Failed to create project.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTogglePublished = async (
-    id: string
-  ) => {
-    try {
-      setPublishingId(id);
-
-      const result =
-        await toggleProjectPublished(id);
-
-      if (result.published) {
-        toast.success(
-          "Project published successfully."
+        setSlug(
+            value
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "")
         );
-      } else {
-        toast.success(
-          "Project unpublished successfully."
-        );
-      }
+    };
 
-      router.refresh();
-    } catch (error) {
-      console.error(error);
+    const handleEditProject = (project: AdminProject) => {
+        setEditingProject(project);
 
-      toast.error(
-        "Failed to change project publish status."
-      );
-    } finally {
-      setPublishingId(null);
-    }
-  };
+        setTitle(project.title);
+        setSlug(project.slug);
+        setCategory(project.category);
+        setYear(project.year);
+        setDescription(project.description);
+        setImage(null);
 
-  return (
-    <>
-      {/* HEADER */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[#b8895b]">
-            Admin / Projects
-          </p>
+        setShowForm(true);
+    };
 
-          <h1 className="mt-4 text-4xl font-medium md:text-5xl">
-            Projects
-          </h1>
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
+        e.preventDefault();
 
-          <p className="mt-3 text-sm text-[#6f716d]">
-            {projectCount} projects in the database.
-          </p>
-        </div>
+        if (
+            !title ||
+            !slug ||
+            !category ||
+            !year ||
+            !description
+        ) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
 
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b]"
-        >
-          + Add Project
-        </button>
-      </div>
+        try {
+            setLoading(true);
 
-      {/* ADD PROJECT MODAL */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-[#f8f7f4] p-8">
-            <div className="mb-8 flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-[#b8895b]">
-                  New Project
-                </p>
+            let imageUrl = editingProject?.image ?? "";
 
-                <h2 className="mt-2 text-3xl font-medium">
-                  Add Project
-                </h2>
-              </div>
+            if (image) {
+                imageUrl = await uploadImage(image);
+            }
 
-              <button
-                type="button"
-                onClick={resetForm}
-                disabled={loading}
-                className="text-2xl text-[#6f716d] transition hover:text-black"
-              >
-                ×
-              </button>
-            </div>
+            if (editingProject) {
+                await updateProject(editingProject._id, {
+                    title,
+                    slug,
+                    category,
+                    year,
+                    description,
+                    image: imageUrl,
+                });
 
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-5"
-            >
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Title *
-                </label>
+                toast.success("Project updated successfully.");
+            } else {
+                if (!image) {
+                    toast.error("Please select a project image.");
+                    return;
+                }
 
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) =>
-                    handleTitleChange(e.target.value)
-                  }
-                  placeholder="Oak Residence"
-                  className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
-                />
-              </div>
+                await createProject({
+                    title,
+                    slug,
+                    category,
+                    year,
+                    description,
+                    image: imageUrl,
+                    published: false,
+                });
 
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Slug *
-                </label>
+                toast.success("Project created successfully.");
+            }
 
-                <input
-                  type="text"
-                  value={slug}
-                  onChange={(e) =>
-                    setSlug(e.target.value)
-                  }
-                  placeholder="oak-residence"
-                  className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
-                />
-              </div>
+            resetForm();
 
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Category *
-                </label>
+            router.refresh();
+        } catch (error) {
+            console.error(error);
 
-                <input
-                  type="text"
-                  value={category}
-                  onChange={(e) =>
-                    setCategory(e.target.value)
-                  }
-                  placeholder="Full Renovation"
-                  className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
-                />
-              </div>
+            toast.error(
+                editingProject
+                    ? "Failed to update project."
+                    : "Failed to create project."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Year *
-                </label>
+    const handleTogglePublished = async (
+        id: string
+    ) => {
+        try {
+            setPublishingId(id);
 
-                <input
-                  type="text"
-                  value={year}
-                  onChange={(e) =>
-                    setYear(e.target.value)
-                  }
-                  placeholder="2026"
-                  className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
-                />
-              </div>
+            const result =
+                await toggleProjectPublished(id);
 
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Description *
-                </label>
+            if (result.published) {
+                toast.success(
+                    "Project published successfully."
+                );
+            } else {
+                toast.success(
+                    "Project unpublished successfully."
+                );
+            }
 
-                <textarea
-                  value={description}
-                  onChange={(e) =>
-                    setDescription(e.target.value)
-                  }
-                  rows={6}
-                  placeholder="Describe the project..."
-                  className="w-full resize-none border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
-                />
-              </div>
+            router.refresh();
+        } catch (error) {
+            console.error(error);
 
-              <div>
-                <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Project Image *
-                </label>
+            toast.error(
+                "Failed to change project publish status."
+            );
+        } finally {
+            setPublishingId(null);
+        }
+    };
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setImage(
-                      e.target.files?.[0] ?? null
-                    )
-                  }
-                  className="w-full border border-black/10 bg-white px-4 py-3 text-sm"
-                />
-              </div>
+    const handleDeleteProject = (
+        id: string,
+        title: string
+    ) => {
+        toast.warning(`Delete "${title}"?`, {
+            description: "This action cannot be undone.",
+            duration: 8000,
+            action: {
+                label: "Delete",
+                onClick: async () => {
+                    try {
+                        await deleteProject(id);
 
-              <div className="flex justify-end gap-3 border-t border-black/10 pt-6">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  disabled={loading}
-                  className="border border-black/10 px-6 py-3 text-sm transition hover:bg-black/5"
-                >
-                  Cancel
-                </button>
+                        toast.success(
+                            "Project deleted successfully."
+                        );
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {loading
-                    ? "Creating..."
-                    : "Create Project"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                        router.refresh();
+                    } catch (error) {
+                        console.error(error);
 
-      {/* PROJECT LIST */}
-      <div className="mt-12 overflow-hidden border border-black/10">
-        {projects.length === 0 ? (
-          <div className="p-12 text-center text-[#6f716d]">
-            No projects found.
-          </div>
-        ) : (
-          projects.map((project, index) => (
-            <div
-              key={project._id}
-              className="grid gap-6 border-b border-black/10 p-6 last:border-b-0 md:grid-cols-[60px_180px_1fr_auto] md:items-center"
-            >
-              <span className="text-xs text-[#b8895b]">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-
-              <div className="h-28 overflow-hidden bg-black/5">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-
-              <div>
-                <h2 className="text-xl font-medium">
-                  {project.title}
-                </h2>
-
-                <p className="mt-1 text-sm text-[#6f716d]">
-                  {project.description}
-                </p>
-
-                <div className="mt-3 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.16em]">
-                  <span>{project.category}</span>
-
-                  <span>{project.year}</span>
-
-                  <span
-                    className={
-                      project.published
-                        ? "text-green-700"
-                        : "text-red-600"
+                        toast.error(
+                            "Failed to delete project."
+                        );
                     }
-                  >
-                    {project.published
-                      ? "Published"
-                      : "Unpublished"}
-                  </span>
+                },
+            },
+        });
+    };
+
+    return (
+        <>
+            {/* HEADER */}
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-[#b8895b]">
+                        Admin / Projects
+                    </p>
+
+                    <h1 className="mt-4 text-4xl font-medium md:text-5xl">
+                        Projects
+                    </h1>
+
+                    <p className="mt-3 text-sm text-[#6f716d]">
+                        {projectCount} projects in the database.
+                    </p>
                 </div>
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleTogglePublished(
-                      project._id
-                    )
-                  }
-                  disabled={
-                    publishingId === project._id
-                  }
-                  className="border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {publishingId === project._id
-                    ? "Updating..."
-                    : project.published
-                      ? "Unpublish"
-                      : "Publish"}
-                </button>
 
                 <button
-                  type="button"
-                  className="border border-black/10 px-4 py-2 text-xs transition hover:bg-black/5"
+                    type="button"
+                    onClick={() => {
+                        setEditingProject(null);
+                        setTitle("");
+                        setSlug("");
+                        setCategory("");
+                        setYear("");
+                        setDescription("");
+                        setImage(null);
+                        setShowForm(true);
+                    }}
+                    className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b]"
                 >
-                  Edit
+                    + Add Project
                 </button>
-
-                <button
-                  type="button"
-                  className="border border-red-200 px-4 py-2 text-xs text-red-600 transition hover:bg-red-50"
-                >
-                  Delete
-                </button>
-              </div>
             </div>
-          ))
-        )}
-      </div>
-    </>
-  );
+
+            {/* PROJECT FORM MODAL */}
+            {showForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-[#f8f7f4] p-8">
+                        <div className="mb-8 flex items-start justify-between">
+                            <div>
+                                <p className="text-xs uppercase tracking-[0.2em] text-[#b8895b]">
+                                    {editingProject
+                                        ? "Edit Project"
+                                        : "New Project"}
+                                </p>
+
+                                <h2 className="mt-2 text-3xl font-medium">
+                                    {editingProject
+                                        ? "Edit Project"
+                                        : "Add Project"}
+                                </h2>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={resetForm}
+                                disabled={loading}
+                                className="text-2xl text-[#6f716d] transition hover:text-black"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <form
+                            onSubmit={handleSubmit}
+                            className="space-y-5"
+                        >
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    Title *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) =>
+                                        handleTitleChange(e.target.value)
+                                    }
+                                    placeholder="Oak Residence"
+                                    className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    Slug *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={slug}
+                                    onChange={(e) =>
+                                        setSlug(e.target.value)
+                                    }
+                                    placeholder="oak-residence"
+                                    className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    Category *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={category}
+                                    onChange={(e) =>
+                                        setCategory(e.target.value)
+                                    }
+                                    placeholder="Full Renovation"
+                                    className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    Year *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={year}
+                                    onChange={(e) =>
+                                        setYear(e.target.value)
+                                    }
+                                    placeholder="2026"
+                                    className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    Description *
+                                </label>
+
+                                <textarea
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
+                                    rows={6}
+                                    placeholder="Describe the project..."
+                                    className="w-full resize-none border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
+                                />
+                            </div>
+
+                            {/* EXISTING IMAGE */}
+                            {editingProject?.image && (
+                                <div>
+                                    <label className="mb-2 block text-xs uppercase tracking-wider">
+                                        Current Image
+                                    </label>
+
+                                    <img
+                                        src={editingProject.image}
+                                        alt={editingProject.title}
+                                        className="h-40 w-full object-cover"
+                                    />
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="mb-2 block text-xs uppercase tracking-wider">
+                                    {editingProject
+                                        ? "Replace Image (Optional)"
+                                        : "Project Image *"}
+                                </label>
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                        setImage(
+                                            e.target.files?.[0] ?? null
+                                        )
+                                    }
+                                    className="w-full border border-black/10 bg-white px-4 py-3 text-sm"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 border-t border-black/10 pt-6">
+                                <button
+                                    type="button"
+                                    onClick={resetForm}
+                                    disabled={loading}
+                                    className="border border-black/10 px-6 py-3 text-sm transition hover:bg-black/5"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {loading
+                                        ? editingProject
+                                            ? "Updating..."
+                                            : "Creating..."
+                                        : editingProject
+                                            ? "Update Project"
+                                            : "Create Project"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* PROJECT LIST */}
+            <div className="mt-12 overflow-hidden border border-black/10">
+                {projects.length === 0 ? (
+                    <div className="p-12 text-center text-[#6f716d]">
+                        No projects found.
+                    </div>
+                ) : (
+                    projects.map((project, index) => (
+                        <div
+                            key={project._id}
+                            className="grid gap-6 border-b border-black/10 p-6 last:border-b-0 md:grid-cols-[60px_180px_1fr_auto] md:items-center"
+                        >
+                            <span className="text-xs text-[#b8895b]">
+                                {String(index + 1).padStart(2, "0")}
+                            </span>
+
+                            <div className="h-28 overflow-hidden bg-black/5">
+                                <img
+                                    src={project.image}
+                                    alt={project.title}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+
+                            <div>
+                                <h2 className="text-xl font-medium">
+                                    {project.title}
+                                </h2>
+
+                                <p className="mt-1 text-sm text-[#6f716d]">
+                                    {project.description}
+                                </p>
+
+                                <div className="mt-3 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.16em]">
+                                    <span>{project.category}</span>
+
+                                    <span>{project.year}</span>
+
+                                    <span
+                                        className={
+                                            project.published
+                                                ? "text-green-700"
+                                                : "text-red-600"
+                                        }
+                                    >
+                                        {project.published
+                                            ? "Published"
+                                            : "Unpublished"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleTogglePublished(
+                                            project._id
+                                        )
+                                    }
+                                    disabled={
+                                        publishingId === project._id
+                                    }
+                                    className="border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {publishingId === project._id
+                                        ? "Updating..."
+                                        : project.published
+                                            ? "Unpublish"
+                                            : "Publish"}
+                                </button>
+                                <a
+                                    href={`/projects/${project.slug}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white"
+                                >
+                                    View
+                                </a>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleEditProject(project)
+                                    }
+                                    className="border border-black/10 px-4 py-2 text-xs transition hover:bg-black/5"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleDeleteProject(
+                                            project._id,
+                                            project.title
+                                        )
+                                    }
+                                    className="border border-red-200 px-4 py-2 text-xs text-red-600 transition hover:bg-red-50"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </>
+    );
 }

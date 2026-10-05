@@ -175,3 +175,97 @@ export async function toggleProjectPublished(
 
   return response.json();
 }
+
+export async function updateProject(
+  id: string,
+  project: Partial<Project>
+) {
+  const response = await fetch(
+    `${API_URL}/admin/projects/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(project),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update project");
+  }
+
+  return response.json();
+}
+
+export async function deleteProject(id: string) {
+  const response = await fetch(
+    `${API_URL}/admin/projects/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete project");
+  }
+
+  return response.json();
+}
+
+export async function getProjectBySlug(
+  slug: string
+): Promise<Project | null> {
+  const response = await fetch(
+    `${API_URL}/projects/${slug}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch project");
+  }
+
+  return response.json();
+}
+
+//admin blog api 
+
+
+export async function getAdminBlogs(): Promise<Blog[]> {
+  const response = await fetch(
+    `${API_URL}/admin/blogs`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch admin blogs");
+  }
+
+  return response.json();
+}
+
+export async function createBlog(
+  blog: Omit<Blog, "_id" | "createdAt">
+) {
+  const response = await fetch(
+    `${API_URL}/admin/blogs`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(blog),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to create blog");
+  }
+
+  return response.json();
+}
