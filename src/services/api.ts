@@ -42,7 +42,7 @@ export interface AdminStats {
   projects: number;
   blogs: number;
 }
-
+// Admin service api
 export async function getAdminStats(): Promise<AdminStats> {
   const response = await fetch(`${API_URL}/admin/stats`);
 
@@ -121,6 +121,56 @@ export async function toggleServicePublished(id: string) {
 
   if (!response.ok) {
     throw new Error("Failed to change service publish status");
+  }
+
+  return response.json();
+}
+// Admin Project Api
+export async function getAdminProjects(): Promise<Project[]> {
+  const response = await fetch(`${API_URL}/admin/projects`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch admin projects");
+  }
+
+  return response.json();
+}
+
+export async function createProject(
+  project: Omit<Project, "_id" | "createdAt">
+) {
+  const response = await fetch(
+    `${API_URL}/projects`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(project),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to create project");
+  }
+
+  return response.json();
+}
+
+export async function toggleProjectPublished(
+  id: string
+) {
+  const response = await fetch(
+    `${API_URL}/admin/projects/${id}/publish`,
+    {
+      method: "PATCH",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to change project publish status"
+    );
   }
 
   return response.json();

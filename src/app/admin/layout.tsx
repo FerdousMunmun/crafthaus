@@ -1,4 +1,5 @@
 import Sidebar from "@/components/admin/Sidebar";
+import AdminToaster from "@/components/admin/AdminToaster"
 
 export default function AdminLayout({
   children,
@@ -12,6 +13,8 @@ export default function AdminLayout({
       <main className="min-w-0 flex-1">
         {children}
       </main>
+
+      <AdminToaster />
     </div>
   );
 }
