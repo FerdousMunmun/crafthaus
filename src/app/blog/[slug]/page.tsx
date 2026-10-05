@@ -1,12 +1,41 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Blog } from "@/types/blog";
+import { notFound } from "next/navigation";
 
-interface BlogDetailsProps {
-  blog: Blog;
-}
+type Blog = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  author: string;
+  published: boolean;
+  createdAt: string;
+};
 
-export default function BlogDetails({ blog }: BlogDetailsProps) {
+type PageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
+
+export default async function BlogDetailsPage({ params }: PageProps) {
+  const { slug } = await params;
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/blogs/${slug}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    notFound();
+  }
+
+  const blog: Blog = await response.json();
+
   return (
     <main className="min-h-screen bg-[#f8f7f4]">
       <article className="section-padding">
@@ -43,7 +72,7 @@ export default function BlogDetails({ blog }: BlogDetailsProps) {
             />
           </div>
 
-          <div className="mt-14 max-w-3xl border-t border-black/10 pt-10">
+          <div className="mt-14 max-w-3xl">
             <div className="whitespace-pre-line text-lg leading-9 text-[#343632]">
               {blog.content}
             </div>
