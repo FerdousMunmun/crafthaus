@@ -70,6 +70,9 @@ export interface AdminStats {
 
 export async function getAdminServices(): Promise<Service[]> {
   const { data: token } = await authClient.token();
+  if (!token?.token) {
+  throw new Error("Authentication token not found");
+}
   const response = await fetch(`${API_URL}/admin/services`,{
     headers: {
       Authorization: `Bearer ${token?.token}`,

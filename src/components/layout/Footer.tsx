@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="md:text-right">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-3 border border-[#b8895b] px-6 py-4 text-sm uppercase tracking-[0.12em] text-[#b8895b] transition-all duration-300 hover:bg-[#b8895b] hover:text-white"
+              className="relative z-50 inline-flex items-center gap-3 border border-[#b8895b] px-6 py-4 text-sm uppercase tracking-[0.12em] text-[#b8895b] transition-all duration-300 hover:bg-[#b8895b] hover:text-white"
             >
               Start a conversation
               <ArrowUpRight size={18} />
