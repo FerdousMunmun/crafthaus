@@ -1,8 +1,24 @@
+
+"use client";
 import Link from "next/link";
 import { getAdminStats } from "@/services/api";
+import { useEffect, useState } from "react";
 
-export default async function AdminDashboard() {
-  const stats = await getAdminStats();
+export default  function AdminDashboard() {
+ const [stats, setStats] = useState({
+    services: 0,
+    projects: 0,
+    blogs: 0,
+  });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const data = await getAdminStats();
+      setStats(data);
+    };
+
+    loadStats();
+  }, []);
 
   const dashboardItems = [
     {

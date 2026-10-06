@@ -74,3 +74,21 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+.feedback-track {
+  animation: feedback-scroll-right 35s linear infinite;
+}
+
+.feedback-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes feedback-scroll-right {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}

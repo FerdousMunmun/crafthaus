@@ -1,8 +1,14 @@
 import type { Project } from "@/types/project";
 import type { Service } from "@/types/service";
 import type { Blog } from "@/types/blog";
+import { authClient } from "@/lib/auth-client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+
+
+
+
 
 export async function getProjects(): Promise<Project[]> {
   const response = await fetch(`${API_URL}/projects`);
@@ -43,8 +49,16 @@ export interface AdminStats {
   blogs: number;
 }
 // Admin service api
-export async function getAdminStats(): Promise<AdminStats> {
-  const response = await fetch(`${API_URL}/admin/stats`);
+
+
+  export async function getAdminStats(): Promise<AdminStats> {
+  const { data: token } = await authClient.token();
+
+  const response = await fetch(`${API_URL}/admin/stats`, {
+    headers: {
+      Authorization: `Bearer ${token?.token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch admin stats");
@@ -55,7 +69,12 @@ export async function getAdminStats(): Promise<AdminStats> {
 
 
 export async function getAdminServices(): Promise<Service[]> {
-  const response = await fetch(`${API_URL}/admin/services`);
+  const { data: token } = await authClient.token();
+  const response = await fetch(`${API_URL}/admin/services`,{
+    headers: {
+      Authorization: `Bearer ${token?.token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch admin services");
@@ -65,10 +84,12 @@ export async function getAdminServices(): Promise<Service[]> {
 }
 
 export async function createService(service: Omit<Service, "_id" | "createdAt">) {
+    const { data: token } = await authClient.token();
   const response = await fetch(`${API_URL}/admin/services`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token?.token}`,
     },
     body: JSON.stringify(service),
   });
@@ -84,10 +105,13 @@ export async function updateService(
   id: string,
   service: Partial<Service>
 ) {
+
+  const { data: token } = await authClient.token();
   const response = await fetch(`${API_URL}/admin/services/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+       Authorization: `Bearer ${token?.token}`,
     },
     body: JSON.stringify(service),
   });
@@ -100,8 +124,13 @@ export async function updateService(
 }
 
 export async function deleteService(id: string) {
+  const { data: token } = await authClient.token();
   const response = await fetch(`${API_URL}/admin/services/${id}`, {
     method: "DELETE",
+    headers: {
+      
+       Authorization: `Bearer ${token?.token}`,
+    },
   });
 
   if (!response.ok) {
@@ -112,10 +141,15 @@ export async function deleteService(id: string) {
 }
 
 export async function toggleServicePublished(id: string) {
+   const { data: token } = await authClient.token();
   const response = await fetch(
     `${API_URL}/admin/services/${id}/publish`,
     {
       method: "PATCH",
+      headers: {
+      
+       Authorization: `Bearer ${token?.token}`,
+    },
     }
   );
 
@@ -388,4 +422,67 @@ export async function deleteAdminMessage(id: string) {
   }
 
   return res.json();
+}
+
+export interface SEOSettings {
+  _id?: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  canonicalUrl: string;
+  updatedAt?: string;
+  seoSlug: string;
+}
+
+export async function getAdminSEO(): Promise<SEOSettings | null> {
+  const { data: token } = await authClient.token();
+
+  const response = await fetch(`${API_URL}/admin/seo`, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${token?.token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch SEO settings");
+  }
+
+  return response.json();
+}
+
+export async function updateAdminSEO(
+  seo: SEOSettings
+): Promise<SEOSettings> {
+  const { data: token } = await authClient.token();
+
+  const response = await fetch(`${API_URL}/admin/seo`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token?.token}`,
+    },
+    body: JSON.stringify(seo),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update SEO settings");
+  }
+
+  return response.json();
+}
+
+export async function getSEO(): Promise<SEOSettings | null> {
+  const response = await fetch(`${API_URL}/seo`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch SEO settings");
+  }
+
+  return response.json();
 }

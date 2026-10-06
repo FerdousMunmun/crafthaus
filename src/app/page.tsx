@@ -4,6 +4,8 @@ import Hero from "@/components/home/Hero";
 import About from "@/components/home/About";
 import Service from "@/components/home/Service";
 import Projects from "@/components/home/Projects";
+import FeedbackSection from "@/components/home/FeedbackSection";
+import GrowthChart from "@/components/home/GrowthChart";
 
 export default function HomePage() {
   return (
@@ -13,6 +15,8 @@ export default function HomePage() {
       <About/>
       <Service/>
       <Projects/>
+      <FeedbackSection/>
+      <GrowthChart/>
     </main>
   );
 }

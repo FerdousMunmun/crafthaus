@@ -3,6 +3,8 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import BackToTop from "./BackToTop";
+
 
 export default function SiteChrome({
   children,
@@ -22,6 +24,8 @@ export default function SiteChrome({
       <Navbar />
       {children}
       <Footer />
+      <BackToTop/>
+    
     </>
   );
 }

@@ -31,7 +31,9 @@ const menuItems = [
     label: "Messages",
     href: "/admin/messages",
   },
+  { number: "06", label: "SEO", href: "/admin/seo" },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();

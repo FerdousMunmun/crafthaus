@@ -23,7 +23,7 @@ export default function Hero() {
               </span>
             </div>
 
-            <h1 className="text-[4.5rem] font-medium leading-[0.88] tracking-[-0.06em] text-secondary sm:text-6xl lg:text-[7rem]">
+            <h1 className="text-[3.5rem] font-medium leading-[0.9] tracking-[-0.05em] text-secondary sm:text-5xl lg:text-[5.5rem]">
               We build
               <br />
               <span className="font-serif italic text-primary">
@@ -40,7 +40,7 @@ export default function Hero() {
 
             <div className="mt-9 flex flex-wrap items-center gap-4">
               <Link
-                href="#contact"
+                href="/contact"
                 className="group inline-flex items-center gap-5 bg-secondary px-7 py-4 text-sm font-semibold text-white transition-all duration-300 hover:bg-primary"
               >
                 Start your project

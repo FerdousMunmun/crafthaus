@@ -15,7 +15,7 @@ export default function ProjectDetails({
       <section className="border-b border-black/10">
         <div className="container-custom py-16 md:py-24">
           <Link
-            href="/projects"
+            href="/#projects"
             className="text-xs uppercase tracking-[0.2em] text-[#6f716d] transition hover:text-[#b8895b]"
           >
             ← Back to Projects
