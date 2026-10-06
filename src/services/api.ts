@@ -376,3 +376,16 @@ export async function toggleAdminMessageRead(id: string) {
 
   return res.json();
 }
+
+
+export async function deleteAdminMessage(id: string) {
+  const res = await fetch(`${API_URL}/admin/messages/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete message");
+  }
+
+  return res.json();
+}

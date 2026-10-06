@@ -1,6 +1,8 @@
 "use client";
 
-import { toggleAdminMessageRead } from "@/services/api";
+
+import { deleteAdminMessage, toggleAdminMessageRead } from "@/services/api";
+import { toast } from "sonner";
 
 interface Message {
   _id: string;
@@ -22,11 +24,10 @@ export default function AdminMessagesClient({
       {messages.map((message) => (
         <div
           key={message._id}
-          className={`border bg-white p-6 ${
-            message.read
-              ? "border-black/10"
-              : "border-[#b8895b]"
-          }`}
+          className={`border bg-white p-6 ${message.read
+            ? "border-black/10"
+            : "border-[#b8895b]"
+            }`}
         >
           <div className="flex items-start justify-between gap-6">
             <div>
@@ -70,6 +71,24 @@ export default function AdminMessagesClient({
             className="mt-5 border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white"
           >
             {message.read ? "Mark as Unread" : "Mark as Read"}
+          </button>
+          <button
+            onClick={() => {
+              toast.warning("Delete this message?", {
+                description: "This action cannot be undone.",
+                action: {
+                  label: "Delete",
+                  onClick: async () => {
+                    await deleteAdminMessage(message._id);
+                    toast.success("Message deleted successfully.");
+                    window.location.reload();
+                  },
+                },
+              });
+            }}
+            className="mt-3 border border-red-200 px-4 py-2 text-xs text-red-600 transition hover:bg-red-600 hover:text-white"
+          >
+            Delete Message
           </button>
         </div>
       ))}

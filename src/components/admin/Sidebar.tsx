@@ -1,7 +1,9 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   {
@@ -33,6 +35,7 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside className="flex min-h-screen w-64 flex-col bg-[#24302b] text-white">
@@ -66,16 +69,14 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-4 px-3 py-3 text-sm transition-colors ${
-                  isActive
+                className={`flex items-center gap-4 px-3 py-3 text-sm transition-colors ${isActive
                     ? "bg-[#b8895b] text-white"
                     : "text-white/60 hover:bg-white/5 hover:text-white"
-                }`}
+                  }`}
               >
                 <span
-                  className={`text-[9px] tracking-[0.15em] ${
-                    isActive ? "text-white/70" : "text-[#b8895b]"
-                  }`}
+                  className={`text-[9px] tracking-[0.15em] ${isActive ? "text-white/70" : "text-[#b8895b]"
+                    }`}
                 >
                   {item.number}
                 </span>
@@ -96,6 +97,17 @@ export default function Sidebar() {
           <span>Back to website</span>
           <span>↗</span>
         </Link>
+
+        <button
+          onClick={async () => {
+            await authClient.signOut();
+            router.push("/login");
+          }}
+          className="mt-2 flex w-full items-center justify-between px-3 py-3 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <span>Logout</span>
+          <span>↗</span>
+        </button>
       </div>
     </aside>
   );
