@@ -35,7 +35,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation part*/}
         <div className="hidden gap-8 md:flex">
           <div className="hidden gap-8 md:flex">
             <Link
