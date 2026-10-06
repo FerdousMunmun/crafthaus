@@ -350,3 +350,29 @@ export async function sendContactMessage(data: {
 
   return response.json();
 }
+
+
+//Admin message api 
+export async function getAdminMessages() {
+  const res = await fetch(`${API_URL}/admin/messages`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch admin messages");
+  }
+
+  return res.json();
+}
+
+export async function toggleAdminMessageRead(id: string) {
+  const res = await fetch(`${API_URL}/admin/messages/${id}/read`, {
+    method: "PATCH",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update message status");
+  }
+
+  return res.json();
+}
