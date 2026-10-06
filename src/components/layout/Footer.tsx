@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { FaInstagram,  FaFacebookF, FaLinkedinIn } from "react-icons/fa";
+import { FaInstagram, FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -36,11 +36,11 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link
-  href="/"
-  className="text-2xl font-bold tracking-[0.16em]"
->
-  CRAFTHAUS
-</Link>
+              href="/"
+              className="text-2xl font-bold tracking-[0.16em]"
+            >
+              CRAFTHAUS
+            </Link>
 
             <p className="mt-6 max-w-sm text-sm leading-7 text-white/50">
               Renovation, carpentry, and interiors shaped around the way you
@@ -61,7 +61,7 @@ export default function Footer() {
             <div className="flex flex-col gap-4 text-sm text-white/60">
               <Link
                 href="/"
-                className="transition-colors hover:text-white"
+                 className="transition-colors hover:text-white"
               >
                 Home
               </Link>
@@ -91,7 +91,13 @@ export default function Footer() {
                 href="/blog"
                 className="transition-colors hover:text-white"
               >
-                Journal
+                Blogs
+              </Link>
+              <Link
+                href="/login"
+                 className="transition-colors hover:text-white"
+              >
+                Admin Login
               </Link>
             </div>
           </div>
@@ -124,33 +130,33 @@ export default function Footer() {
           </div>
 
           {/* Social */}
-         <div>
-  <p className="mb-6 text-xs uppercase tracking-[0.18em] text-[#b8895b]">
-    Follow
-  </p>
+          <div>
+            <p className="mb-6 text-xs uppercase tracking-[0.18em] text-[#b8895b]">
+              Follow
+            </p>
 
-  <div className="flex gap-3">
-    <a
-      href="#"
-      className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
-    >
-     <FaInstagram size={18} />
-    </a>
-    <a
-      href="#"
-      className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
-    >
-     <  FaFacebookF size={18} />
-    </a>
+            <div className="flex gap-3">
+              <a
+                href="#"
+                className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
+              >
+                <FaInstagram size={18} />
+              </a>
+              <a
+                href="#"
+                className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
+              >
+                <  FaFacebookF size={18} />
+              </a>
 
-    <a
-      href="#"
-      className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
-    >
-   <FaLinkedinIn size={18} />
-    </a>
-  </div>
-</div>
+              <a
+                href="#"
+                className="flex h-11 w-11 items-center justify-center border border-white/10 text-sm text-white/60 transition-all duration-300 hover:border-[#b8895b] hover:text-[#b8895b]"
+              >
+                <FaLinkedinIn size={18} />
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Bottom */}

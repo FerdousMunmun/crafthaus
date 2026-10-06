@@ -1,119 +1,132 @@
 "use client";
 
-import { Card, Separator } from "@heroui/react";
-import {
-  Button,
-  Description,
-  FieldError,
-  Form,
-  Input,
-  Label,
-  TextField,
-} from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const LoginPage = () => {
-  const onSubmit = async (e) => {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const user = Object.fromEntries(formData.entries());
-
-    const { data, error } = await authClient.signIn.email({
-      email: user.email,
-      password: user.password,
-    });
-
-
-    if (data) {
-      redirect('/')
+    if (!email || !password) {
+      toast.error("Please enter your email and password.");
+      return;
     }
 
-    if (error) {
-      // toast
-      alert("Error");
-    }
-  };
+    try {
+      setLoading(true);
 
-  const handleGoogleSignin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-    });
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message || "Invalid email or password.");
+        return;
+      }
+
+      if (data) {
+        toast.success("Welcome to CraftHaus Admin!");
+        router.push("/admin");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center my-3">
-        <h1 className="text-2xl font-bold">Login</h1>
-        <p>Start your adventure with Wanderlust</p>
-      </div>
-      <Card className="border rounded-none">
-        <Form onSubmit={onSubmit} className="flex w-96 flex-col gap-4">
-          <TextField
-            isRequired
-            name="email"
-            type="email"
-            validate={(value) => {
-              if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                return "Please enter a valid email address";
-              }
-              return null;
-            }}
-          >
-            <Label>Email</Label>
-            <Input placeholder="john@example.com" />
-            <FieldError />
-          </TextField>
-          <TextField
-            isRequired
-            minLength={8}
-            name="password"
-            type="password"
-            validate={(value) => {
-              if (value.length < 8) {
-                return "Password must be at least 8 characters";
-              }
-              if (!/[A-Z]/.test(value)) {
-                return "Password must contain at least one uppercase letter";
-              }
-              if (!/[0-9]/.test(value)) {
-                return "Password must contain at least one number";
-              }
-              return null;
-            }}
-          >
-            <Label>Password</Label>
-            <Input placeholder="Enter your password" />
-            <Description>
-              Must be at least 8 characters with 1 uppercase and 1 number
-            </Description>
-            <FieldError />
-          </TextField>
-          <div className="flex justify-center gap-2">
-            <Button className={"rounded-none w-full bg-orange-600"} type="submit">
-              Login
-            </Button>
-          </div>
-        </Form>
+    <main className="min-h-screen bg-[#f8f7f4] flex items-center justify-center px-6 py-16">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="mb-10 text-center">
+          <p className="mb-3 text-xs uppercase tracking-[0.3em] text-[#b8895b]">
+            CraftHaus
+          </p>
 
-        <div className="flex justify-center items-center gap-3">
-          <Separator />
-          <div className="whitespace-nowrap"> Or sign up with </div>
-          <Separator />
+          <h1 className="text-4xl font-semibold tracking-tight text-[#24302b]">
+            Admin Login
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-[#6f716d]">
+            Sign in to manage your CraftHaus website.
+          </p>
         </div>
-        <div>
-          <Button
-            onClick={handleGoogleSignin}
-            variant="outline"
-            className={"w-full rounded-none"}
-          >
-            <FcGoogle /> Sign in with Google
-          </Button>
+
+        {/* Login Card */}
+        <div className="border border-[#dedbd4] bg-white p-8 shadow-sm">
+          <form onSubmit={onSubmit} className="space-y-6">
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-medium text-[#24302b]"
+              >
+                Email
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                autoComplete="email"
+                required
+                className="w-full border border-[#dedbd4] bg-[#f8f7f4] px-4 py-3 text-sm text-[#24302b] outline-none transition focus:border-[#b8895b]"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="password"
+                className="mb-2 block text-sm font-medium text-[#24302b]"
+              >
+                Password
+              </label>
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                required
+                className="w-full border border-[#dedbd4] bg-[#f8f7f4] px-4 py-3 text-sm text-[#24302b] outline-none transition focus:border-[#b8895b]"
+              />
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#24302b] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[#b8895b] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
         </div>
-      </Card>
-    </div>
+
+        {/* Footer text */}
+        <p className="mt-6 text-center text-xs text-[#6f716d]">
+          CraftHaus Administration
+        </p>
+      </div>
+    </main>
   );
 };
 

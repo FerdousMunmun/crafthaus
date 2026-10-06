@@ -15,7 +15,7 @@ export default function BlogDetails({ blog }: BlogDetailsProps) {
             href="/blog"
             className="mb-12 inline-block text-sm text-[#6f716d] transition-colors hover:text-[#b8895b]"
           >
-            ← Back to journal
+            ← Back to blogs
           </Link>
 
           <div className="max-w-4xl">

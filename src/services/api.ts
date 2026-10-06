@@ -269,3 +269,84 @@ export async function createBlog(
 
   return response.json();
 }
+
+export async function updateBlog(
+  id: string,
+  blog: Partial<Blog>
+) {
+  const response = await fetch(
+    `${API_URL}/admin/blogs/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(blog),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update blog");
+  }
+
+  return response.json();
+}
+export async function toggleBlogPublished(
+  id: string
+) {
+  const response = await fetch(
+    `${API_URL}/admin/blogs/${id}/publish`,
+    {
+      method: "PATCH",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to change blog publish status"
+    );
+  }
+
+  return response.json();
+}
+
+export async function deleteBlog(id: string) {
+  const response = await fetch(
+    `${API_URL}/admin/blogs/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete blog");
+  }
+
+  return response.json();
+}
+
+export async function sendContactMessage(data: {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+}) {
+  const response = await fetch(
+    `${API_URL}/contact`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to send contact message"
+    );
+  }
+
+  return response.json();
+}

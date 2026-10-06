@@ -4,20 +4,44 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { createBlog } from "@/services/api";
+import {
+  createBlog,
+  updateBlog,
+  toggleBlogPublished,
+  deleteBlog,
+} from "@/services/api";
+
 import { uploadImage } from "@/services/image";
+
+interface AdminBlog {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  author: string;
+  published: boolean;
+}
 
 interface AdminBlogsClientProps {
   blogCount: number;
+  blogs: AdminBlog[];
 }
 
 export default function AdminBlogsClient({
   blogCount,
+  blogs,
 }: AdminBlogsClientProps) {
   const router = useRouter();
 
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [publishingId, setPublishingId] =
+    useState<string | null>(null);
+
+  const [editingBlog, setEditingBlog] =
+    useState<AdminBlog | null>(null);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -34,6 +58,7 @@ export default function AdminBlogsClient({
     setAuthor("");
     setImage(null);
     setShowForm(false);
+    setEditingBlog(null);
   };
 
   const handleTitleChange = (value: string) => {
@@ -48,6 +73,78 @@ export default function AdminBlogsClient({
     );
   };
 
+  const handleEditBlog = (blog: AdminBlog) => {
+    setEditingBlog(blog);
+
+    setTitle(blog.title);
+    setSlug(blog.slug);
+    setExcerpt(blog.excerpt);
+    setContent(blog.content);
+    setAuthor(blog.author);
+    setImage(null);
+
+    setShowForm(true);
+  };
+  const handleTogglePublished = async (
+    id: string
+  ) => {
+    try {
+      setPublishingId(id);
+
+      const result =
+        await toggleBlogPublished(id);
+
+      if (result.published) {
+        toast.success(
+          "Blog published successfully."
+        );
+      } else {
+        toast.success(
+          "Blog unpublished successfully."
+        );
+      }
+
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        "Failed to change blog publish status."
+      );
+    } finally {
+      setPublishingId(null);
+    }
+  };
+
+  const handleDeleteBlog = (
+    id: string,
+    title: string
+  ) => {
+    toast.warning(`Delete "${title}"?`, {
+      description: "This action cannot be undone.",
+      duration: 8000,
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            await deleteBlog(id);
+
+            toast.success(
+              "Blog deleted successfully."
+            );
+
+            router.refresh();
+          } catch (error) {
+            console.error(error);
+
+            toast.error(
+              "Failed to delete blog."
+            );
+          }
+        },
+      },
+    });
+  };
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -58,29 +155,58 @@ export default function AdminBlogsClient({
       !slug ||
       !excerpt ||
       !content ||
-      !author ||
-      !image
+      !author
     ) {
-      toast.error("Please fill in all required fields.");
+      toast.error(
+        "Please fill in all required fields."
+      );
       return;
     }
 
     try {
       setLoading(true);
 
-      const imageUrl = await uploadImage(image);
+      let imageUrl = editingBlog?.image ?? "";
 
-      await createBlog({
-        title,
-        slug,
-        excerpt,
-        content,
-        image: imageUrl,
-        author,
-        published: false,
-      });
+      if (image) {
+        imageUrl = await uploadImage(image);
+      }
 
-      toast.success("Blog created successfully.");
+      if (editingBlog) {
+        await updateBlog(editingBlog._id, {
+          title,
+          slug,
+          excerpt,
+          content,
+          author,
+          image: imageUrl,
+        });
+
+        toast.success(
+          "Blog updated successfully."
+        );
+      } else {
+        if (!image) {
+          toast.error(
+            "Please select a blog image."
+          );
+          return;
+        }
+
+        await createBlog({
+          title,
+          slug,
+          excerpt,
+          content,
+          author,
+          image: imageUrl,
+          published: false,
+        });
+
+        toast.success(
+          "Blog created successfully."
+        );
+      }
 
       resetForm();
 
@@ -88,7 +214,11 @@ export default function AdminBlogsClient({
     } catch (error) {
       console.error(error);
 
-      toast.error("Failed to create blog.");
+      toast.error(
+        editingBlog
+          ? "Failed to update blog."
+          : "Failed to create blog."
+      );
     } finally {
       setLoading(false);
     }
@@ -114,25 +244,39 @@ export default function AdminBlogsClient({
 
         <button
           type="button"
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            setEditingBlog(null);
+            setTitle("");
+            setSlug("");
+            setExcerpt("");
+            setContent("");
+            setAuthor("");
+            setImage(null);
+            setShowForm(true);
+          }}
           className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b]"
         >
           + Add Blog
         </button>
       </div>
 
-      {/* CREATE BLOG MODAL */}
+      {/* BLOG FORM MODAL */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[#f8f7f4] p-8">
+            {/* MODAL HEADER */}
             <div className="mb-8 flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-[#b8895b]">
-                  New Blog
+                  {editingBlog
+                    ? "Edit Blog"
+                    : "New Blog"}
                 </p>
 
                 <h2 className="mt-2 text-3xl font-medium">
-                  Add Blog
+                  {editingBlog
+                    ? "Edit Blog"
+                    : "Add Blog"}
                 </h2>
               </div>
 
@@ -146,10 +290,12 @@ export default function AdminBlogsClient({
               </button>
             </div>
 
+            {/* FORM */}
             <form
               onSubmit={handleSubmit}
               className="space-y-5"
             >
+              {/* TITLE */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
                   Title *
@@ -159,13 +305,16 @@ export default function AdminBlogsClient({
                   type="text"
                   value={title}
                   onChange={(e) =>
-                    handleTitleChange(e.target.value)
+                    handleTitleChange(
+                      e.target.value
+                    )
                   }
-                  placeholder="How We Choose Materials for Every Project"
+                  placeholder="How We Choose Materials"
                   className="w-full border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
                 />
               </div>
 
+              {/* SLUG */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
                   Slug *
@@ -182,6 +331,7 @@ export default function AdminBlogsClient({
                 />
               </div>
 
+              {/* EXCERPT */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
                   Excerpt *
@@ -193,11 +343,12 @@ export default function AdminBlogsClient({
                     setExcerpt(e.target.value)
                   }
                   rows={3}
-                  placeholder="Short description of the blog..."
+                  placeholder="Short description..."
                   className="w-full resize-none border border-black/10 bg-white px-4 py-3 outline-none focus:border-[#b8895b]"
                 />
               </div>
 
+              {/* CONTENT */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
                   Content *
@@ -214,6 +365,7 @@ export default function AdminBlogsClient({
                 />
               </div>
 
+              {/* AUTHOR */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
                   Author *
@@ -230,9 +382,27 @@ export default function AdminBlogsClient({
                 />
               </div>
 
+              {/* CURRENT IMAGE */}
+              {editingBlog?.image && (
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-wider">
+                    Current Image
+                  </label>
+
+                  <img
+                    src={editingBlog.image}
+                    alt={editingBlog.title}
+                    className="h-40 w-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* IMAGE */}
               <div>
                 <label className="mb-2 block text-xs uppercase tracking-wider">
-                  Blog Image *
+                  {editingBlog
+                    ? "Replace Image (Optional)"
+                    : "Blog Image *"}
                 </label>
 
                 <input
@@ -240,13 +410,15 @@ export default function AdminBlogsClient({
                   accept="image/*"
                   onChange={(e) =>
                     setImage(
-                      e.target.files?.[0] ?? null
+                      e.target.files?.[0] ??
+                      null
                     )
                   }
                   className="w-full border border-black/10 bg-white px-4 py-3 text-sm"
                 />
               </div>
 
+              {/* ACTIONS */}
               <div className="flex justify-end gap-3 border-t border-black/10 pt-6">
                 <button
                   type="button"
@@ -263,14 +435,128 @@ export default function AdminBlogsClient({
                   className="bg-[#24302b] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#b8895b] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading
-                    ? "Creating..."
-                    : "Create Blog"}
+                    ? editingBlog
+                      ? "Updating..."
+                      : "Creating..."
+                    : editingBlog
+                      ? "Update Blog"
+                      : "Create Blog"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* BLOG LIST */}
+      <div className="mt-12 overflow-hidden border border-black/10">
+        {blogs.length === 0 ? (
+          <div className="p-12 text-center text-[#6f716d]">
+            No blogs found.
+          </div>
+        ) : (
+          blogs.map((blog, index) => (
+            <div
+              key={blog._id}
+              className="grid gap-6 border-b border-black/10 p-6 last:border-b-0 md:grid-cols-[60px_180px_1fr_auto] md:items-center"
+            >
+              {/* NUMBER */}
+              <span className="text-xs text-[#b8895b]">
+                {String(index + 1).padStart(
+                  2,
+                  "0"
+                )}
+              </span>
+
+              {/* IMAGE */}
+              <div className="h-28 overflow-hidden bg-black/5">
+                <img
+                  src={blog.image}
+                  alt={blog.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* INFO */}
+              <div>
+                <h2 className="text-xl font-medium">
+                  {blog.title}
+                </h2>
+
+                <p className="mt-1 text-sm text-[#6f716d]">
+                  {blog.excerpt}
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.16em]">
+                  <span>
+                    {blog.author}
+                  </span>
+
+                  <span
+                    className={
+                      blog.published
+                        ? "text-green-700"
+                        : "text-red-600"
+                    }
+                  >
+                    {blog.published
+                      ? "Published"
+                      : "Unpublished"}
+                  </span>
+                </div>
+              </div>
+
+              {/* ACTIONS */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleTogglePublished(blog._id)
+                  }
+                  disabled={publishingId === blog._id}
+                  className="border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {publishingId === blog._id
+                    ? "Updating..."
+                    : blog.published
+                      ? "Unpublish"
+                      : "Publish"}
+                </button>
+                <a
+                  href={`/blog/${blog.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-black/10 px-4 py-2 text-xs transition hover:bg-[#24302b] hover:text-white"
+                >
+                  View
+                </a>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleEditBlog(blog)
+                  }
+                  className="border border-black/10 px-4 py-2 text-xs transition hover:bg-black/5"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDeleteBlog(
+                      blog._id,
+                      blog.title
+                    )
+                  }
+                  className="border border-red-200 px-4 py-2 text-xs text-red-600 transition hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </>
   );
 }

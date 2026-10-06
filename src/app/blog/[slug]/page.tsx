@@ -44,7 +44,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
             href="/blog"
             className="mb-12 inline-block text-sm text-[#6f716d] transition-colors hover:text-[#b8895b]"
           >
-            ← Back to journal
+            ← Back to Blogs
           </Link>
 
           <div className="max-w-4xl">

@@ -10,7 +10,7 @@ export default async function BlogPage() {
         <div className="container-custom">
           <div className="mb-16 max-w-3xl">
             <p className="mb-4 text-sm uppercase tracking-[0.2em] text-[#b8895b]">
-              Journal / Ideas
+              Blogs / Insights
             </p>
 
             <h1 className="text-5xl font-medium leading-tight md:text-7xl">
