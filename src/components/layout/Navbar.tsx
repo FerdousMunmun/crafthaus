@@ -12,6 +12,11 @@ export default function Navbar() {
   };
 
   return (
+  <>
+      {/* Premium Moving Line */}
+    <div className="fixed left-0 top-0 z-[9999] h-[2px] w-full bg-[#dedbd4]">
+      <div className="h-full w-[35%] animate-[premiumLine_3s_ease-in-out_infinite] bg-[#b8895b]" />
+    </div>
     <nav className="border-b border-black/10 bg-[#f8f7f4]">
       <div className="container-custom flex h-20 items-center justify-between">
 
@@ -171,5 +176,6 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+    </>
   );
 }

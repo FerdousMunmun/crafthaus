@@ -139,3 +139,23 @@ img {
     transform: translateX(0);
   }
 }
+
+/* ================================
+   Premium Navbar Moving Line
+================================ */
+
+@keyframes premiumLine {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(400%);
+    opacity: 0.4;
+  }
+}
