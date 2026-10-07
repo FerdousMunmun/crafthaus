@@ -146,16 +146,10 @@ img {
 
 @keyframes premiumLine {
   0% {
-    transform: translateX(-120%);
-    opacity: 0.4;
-  }
-
-  50% {
-    opacity: 1;
+    transform: translateX(0);
   }
 
   100% {
-    transform: translateX(400%);
-    opacity: 0.4;
+    transform: translateX(-50%);
   }
 }
