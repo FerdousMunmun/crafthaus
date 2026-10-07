@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -15,29 +14,62 @@ export default function Navbar() {
   return (
     <nav className="border-b border-black/10 bg-[#f8f7f4]">
       <div className="container-custom flex h-20 items-center justify-between">
+
         {/* Logo */}
         <Link
           href="/"
           onClick={closeMenu}
           className="group flex items-center gap-3"
         >
+          {/* House Icon */}
           <FaHouse
             size={17}
-            className="text-[#b8895b] transition-transform duration-300 group-hover:-translate-y-0.5"
+            className="
+              text-[#b8895b]
+              animate-[logoIcon_0.8s_ease-out]
+              transition-all
+              duration-300
+              group-hover:-translate-y-1
+              group-hover:rotate-3
+            "
           />
 
-          <span className="text-2xl font-semibold tracking-[0.14em] text-[#24302b]">
+          {/* Brand Name */}
+          <span
+            className="
+              text-2xl
+              font-semibold
+              tracking-[0.14em]
+              text-[#24302b]
+              animate-[logoText_0.9s_ease-out]
+              transition-all
+              duration-300
+              group-hover:tracking-[0.18em]
+            "
+          >
             CRAFTHAUS
           </span>
 
-          <span className="hidden text-[9px] uppercase tracking-[0.18em] text-[#b8895b] sm:block">
+          {/* Subtitle */}
+          <span
+            className="
+              hidden
+              text-[9px]
+              uppercase
+              tracking-[0.18em]
+              text-[#b8895b]
+              sm:block
+              animate-[logoSubtitle_1.1s_ease-out]
+            "
+          >
             01 / Interiors + Renovation
           </span>
         </Link>
 
-        {/* Desktop Navigation part*/}
+        {/* Desktop Navigation */}
         <div className="hidden gap-8 md:flex">
           <div className="hidden gap-8 md:flex">
+
             <Link
               href="/#about"
               className="relative text-md text-[#131816] transition-colors duration-300 hover:text-[#b8895b]"
@@ -54,7 +86,7 @@ export default function Navbar() {
 
             <Link
               href="/#projects"
-              className="relative text-md text-[#131816]] transition-colors duration-300 hover:text-[#b8895b]"
+              className="relative text-md text-[#131816] transition-colors duration-300 hover:text-[#b8895b]"
             >
               Projects
             </Link>
@@ -72,6 +104,7 @@ export default function Navbar() {
             >
               Contact
             </Link>
+
           </div>
         </div>
 
@@ -93,6 +126,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-[#dedbd4] bg-[#f8f7f4] md:hidden">
           <div className="container-custom flex flex-col py-4">
+
             <Link
               href="/#about"
               onClick={closeMenu}
@@ -132,6 +166,7 @@ export default function Navbar() {
             >
               Contact
             </Link>
+
           </div>
         </div>
       )}
