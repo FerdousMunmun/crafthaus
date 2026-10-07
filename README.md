@@ -1,36 +1,203 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🏠 CraftHaus
 
-## Getting Started
+Modern renovation, carpentry & interior design platform built with Next.js, TypeScript, Express.js, MongoDB and Better Auth.
 
-First, run the development server:
+🌐 Live: https://crafthaus-nu.vercel.app
 
-```bash
+⚙️ API: https://crafthaus-backend.vercel.app
+
+✨ Features
+
+🌿 Public Website
+
+- Responsive modern homepage
+- Dynamic Services & Projects
+- Project detail pages
+- Blog & blog detail pages
+- Contact form
+- Responsive navbar & footer
+- Premium editorial-style UI
+🔐 Admin Dashboard
+
+- Better Auth login
+- Admin role protection
+- Services CRUD
+- Projects CRUD
+- Blog CRUD
+- Publish / Unpublish
+- Contact message management
+- Image uploads with ImageBB
+- SEO management
+- Toast notifications
+🚀 SEO
+
+Admin can manage:
+- Meta title & description
+- Keywords
+- Open Graph title, description & image
+- Canonical URL
+- 
+🛠️ Tech Stack
+
+Frontend
+Next.js TypeScript Tailwind CSS HeroUI Better Auth Recharts Sonner React Icons
+Backend
+
+Node.js Express.js TypeScript MongoDB JOSE CORS dotenv
+MongoDB Native Driver is used. No Mongoose.
+
+🏗️ Architecture
+
+Next.js Frontend
+       ↓
+   Fetch API
+       ↓
+Express.js REST API
+       ↓
+     MongoDB
+
+Better Auth
+   ↓ JWT
+JWKS Verification
+   ↓
+Protected Admin API
+
+📁 Structure
+
+Frontend
+src/
+├── app/
+│   ├── admin/
+│   ├── blog/
+│   ├── contact/
+│   ├── login/
+│   ├── projects/
+│   ├── services/
+│   └── page.tsx
+├── components/
+├── lib/
+├── services/
+└── types/
+
+Backend
+
+crafthaus-backend/
+├── index.ts
+├── .env
+├── package.json
+├── tsconfig.json
+└── vercel.json
+
+🔄 Content Flow
+
+Admin Dashboard
+      ↓
+Frontend API Layer
+      ↓
+Express API
+      ↓
+MongoDB
+      ↓
+Public Website
+
+Collections:
+
+services · projects · blogs · contact_messages · seo
+🔑 Main API Routes
+
+GET    /services
+GET    /services/:slug
+
+GET    /projects
+GET    /projects/:slug
+
+GET    /blogs
+GET    /blogs/:slug
+
+POST   /contact
+
+GET    /admin/stats
+GET    /admin/services
+POST   /admin/services
+PATCH  /admin/services/:id
+DELETE /admin/services/:id
+
+GET    /admin/projects
+PATCH  /admin/projects/:id
+DELETE /admin/projects/:id
+
+GET    /admin/blogs
+POST   /admin/blogs
+PATCH  /admin/blogs/:id
+DELETE /admin/blogs/:id
+
+GET    /admin/messages
+PATCH  /admin/messages/:id/read
+DELETE /admin/messages/:id
+
+GET    /admin/seo
+PATCH  /admin/seo
+
+🔒 Admin routes require a valid Bearer JWT.
+
+⚙️ Environment
+
+Frontend .env
+
+NEXT_PUBLIC_API_URL=http://localhost:5000
+
+NEXT_PUBLIC_IMGBB_API_KEY=use_imgbb_key
+
+MONGO_DB_URI=use_mongodb_uri
+
+AUTH_DB_NAME=crafthaus_auth
+
+BETTER_AUTH_URL=http://localhost:3000
+
+Backend .env
+
+PORT=5000
+MONGO_DB_URI=use_mongodb_uri
+
+CLIENT_URL=http://localhost:3000
+
+💻 Run Locally
+# Frontend
+
+npm install
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Backend
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Frontend → http://localhost:3000
 
-## Learn More
+Backend → http://localhost:5000
 
-To learn more about Next.js, take a look at the following resources:
+🎨 Design
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Crafted Architecture aesthetic using:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#f8f7f4 Warm Ivory · #24302b Charcoal · #b8895b Copper · #6f716d Muted Gray
 
-## Deploy on Vercel
+Focus: minimal · premium · editorial · responsive
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+☁️ Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Both frontend and backend are deployed separately on Vercel.
+
+🌐 Frontend: https://crafthaus-nu.vercel.app
+
+⚙️ Backend: https://crafthaus-backend.vercel.app
+
+👨‍💻 Author
+
+Jannatul Ferdous
+
+Full Stack Developer
+
+Built with ❤️ using modern web technologies.
+⭐ If you like the project, consider giving it a star!
