@@ -45,7 +45,7 @@ export default function Navbar() {
     </span>
   </div>
 </div>
-    <nav className="border-b border-black/10 bg-[#f8f7f4]">
+    <nav className="border-b border-black/10 bg-[#f8f7f4] pt-6">
       <div className="container-custom flex h-20 items-center justify-between">
 
         {/* Logo */}
