@@ -1,4 +1,5 @@
 🏠 CraftHaus
+
 Modern renovation, carpentry & interior design platform built with Next.js, TypeScript, Express.js, MongoDB and Better Auth.
 
 🌐 Live: https://crafthaus-nu.vercel.app
