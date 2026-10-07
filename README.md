@@ -2,8 +2,11 @@
 Modern renovation, carpentry & interior design platform built with Next.js, TypeScript, Express.js, MongoDB and Better Auth.
 
 🌐 Live: https://crafthaus-nu.vercel.app
+
 ⚙️ API: https://crafthaus-backend.vercel.app
+
 ✨ Features
+
 🌿 Public Website
 
 - Responsive modern homepage
@@ -141,15 +144,20 @@ PATCH  /admin/seo
 Frontend .env
 
 NEXT_PUBLIC_API_URL=http://localhost:5000
+
 NEXT_PUBLIC_IMGBB_API_KEY=use_imgbb_key
+
 MONGO_DB_URI=use_mongodb_uri
+
 AUTH_DB_NAME=crafthaus_auth
+
 BETTER_AUTH_URL=http://localhost:3000
 
 Backend .env
 
 PORT=5000
 MONGO_DB_URI=use_mongodb_uri
+
 CLIENT_URL=http://localhost:3000
 
 💻 Run Locally
@@ -163,7 +171,9 @@ npm run dev
 npm install
 
 npm run dev
+
 Frontend → http://localhost:3000
+
 Backend → http://localhost:5000
 
 🎨 Design
